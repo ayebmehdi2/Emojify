@@ -70,9 +70,10 @@ public class MainActivity extends AppCompatActivity {
     public void emojifyMe(View view) {
         int GRANTED = PackageManager.PERMISSION_GRANTED;
         int write = ContextCompat.checkSelfPermission(this , Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int read = ContextCompat.checkSelfPermission(this , Manifest.permission.READ_EXTERNAL_STORAGE);
         int camera = ContextCompat.checkSelfPermission(this , Manifest.permission.CAMERA);
-        if (write != GRANTED || camera != GRANTED){
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA}, REQUEST_STORAGE_PERMISSION);
+        if (write != GRANTED || camera != GRANTED || read != GRANTED){
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.CAMERA}, REQUEST_STORAGE_PERMISSION);
         }else {
             launchCamera();
         }
@@ -83,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
         // Called when you request permission to read and write to external storage
         switch (requestCode) {
             case 1: {
-                if (grantResults.length > 1 && grantResults[0] == 0 && grantResults[1] == 0) {
+                if (grantResults.length > 1 && grantResults[0] == 0 && grantResults[1] == 0 && grantResults[2] == 0) {
                     launchCamera();
                 } else {
                     Toast.makeText(this, R.string.permission_denied, Toast.LENGTH_SHORT).show();

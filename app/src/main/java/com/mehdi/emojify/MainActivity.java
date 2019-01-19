@@ -11,15 +11,21 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.SparseArray;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.vision.Frame;
+import com.google.android.gms.vision.face.Face;
+import com.google.android.gms.vision.face.FaceDetector;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.File;
@@ -160,12 +166,51 @@ public class MainActivity extends AppCompatActivity {
         mSaveFab.setVisibility(View.VISIBLE);
         mShareFab.setVisibility(View.VISIBLE);
         mClearFab.setVisibility(View.VISIBLE);
+/*
+        int targetW = mImageView.getWidth();
+        int targetH = mImageView.getHeight();
 
-        // Resample the saved image to fit the ImageView
-        mResultsBitmap = BitmapUtils.resamplePic(this, mTempPhotoPath);
+        // Get the dimensions of the bitmap
+        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+        bmOptions.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(mTempPhotoPath, bmOptions);
+        int photoW = bmOptions.outWidth;
+        int photoH = bmOptions.outHeight;
 
-        // Set the new bitmap to the ImageView
-        mImageView.setImageBitmap(mResultsBitmap);
+        // Determine how much to scale down the image
+        int scaleFactor = Math.min(photoW/targetW, photoH/targetH);
+
+        // Decode the image file into a Bitmap sized to fill the View
+        bmOptions.inJustDecodeBounds = false;
+        bmOptions.inSampleSize = scaleFactor;
+        bmOptions.inPurgeable = true;
+*/
+        Bitmap bitmap = BitmapFactory.decodeFile(mTempPhotoPath);
+
+        new as().execute(bitmap);
+
+        mImageView.setImageBitmap(bitmap);
+    }
+
+    class as extends AsyncTask<Bitmap, Void, Integer>{
+        @Override
+        protected Integer doInBackground(Bitmap... bitmaps) {
+            FaceDetector detector = new FaceDetector.Builder(MainActivity.this)
+                    .setTrackingEnabled(false)
+                    .setLandmarkType(FaceDetector.ALL_LANDMARKS)
+                    .build();
+
+            Frame frame = new Frame.Builder().setBitmap(bitmaps[0]).build();
+
+            SparseArray<Face> faces = detector.detect(frame);
+            return faces.size();
+        }
+
+        @Override
+        protected void onPostExecute(Integer integer) {
+            super.onPostExecute(integer);
+            Toast.makeText(MainActivity.this, "Destected " + integer + " Faces", Toast.LENGTH_LONG).show();
+        }
     }
 
 

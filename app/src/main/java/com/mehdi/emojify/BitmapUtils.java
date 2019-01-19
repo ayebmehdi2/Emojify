@@ -38,8 +38,8 @@ class BitmapUtils {
          WindowManager manager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
          manager.getDefaultDisplay().getMetrics(metrics);
 
-         int targetH = metrics.heightPixels;
-         int targetW = metrics.widthPixels;
+         int screenH = metrics.heightPixels;
+         int screenW = metrics.widthPixels;
 
          // Get the dimensions of the original bitmap
          BitmapFactory.Options bmOptions = new BitmapFactory.Options();
@@ -49,7 +49,7 @@ class BitmapUtils {
          int photoH = bmOptions.outHeight;
 
          // Determine how much to scale down the image
-         int scaleFactor = Math.min(photoW / targetW, photoH / targetH);
+         int scaleFactor = Math.min( photoW / screenH,   photoH / screenW );
 
          // Decode the image file into a Bitmap sized to fill the View
          bmOptions.inJustDecodeBounds = false;

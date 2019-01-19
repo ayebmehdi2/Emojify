@@ -12,13 +12,6 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainActivity">
 
-    <ImageView
-        android:id="@+id/image_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_margin="@dimen/view_margin"
-        android:contentDescription="@string/imageview_description"
-        android:scaleType="fitStart" />
 
     <TextView
         android:id="@+id/title_text_view"
@@ -40,11 +33,63 @@
         android:text="@string/go"
         android:textAppearance="@style/TextAppearance.AppCompat.Display1"/>
 
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/image_view"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:scaleType="centerCrop"
+            android:layout_weight="4"
+            android:layout_margin="@dimen/view_margin"
+            android:contentDescription="@string/imageview_description" />
+
+
+        <RelativeLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:visibility="gone"
+                android:onClick="saveMe"
+                android:layout_centerVertical="true"
+                android:layout_alignParentStart="true"
+                android:id="@+id/save_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_save"
+                android:layout_marginStart="16dp"
+                app:backgroundTint="@android:color/white"
+                tools:ignore="RelativeOverlap" />
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:visibility="gone"
+                android:onClick="shareMe"
+                android:layout_marginEnd="16dp"
+                android:layout_centerVertical="true"
+                android:layout_alignParentEnd="true"
+                android:id="@+id/share_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_share"
+                app:backgroundTint="@android:color/white" />
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:visibility="gone"
+        android:visibility="visible"
         android:onClick="clearImage"
         android:id="@+id/clear_button"
         android:layout_width="wrap_content"
+        android:layout_marginEnd="2dp"
+        android:layout_marginTop="2dp"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
@@ -53,35 +98,5 @@
         app:backgroundTint="@android:color/white"
         app:fabSize="mini" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:visibility="gone"
-        android:onClick="saveMe"
-        android:id="@+id/save_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginBottom="@dimen/fab_margins"
-        android:layout_marginEnd="@dimen/fab_margins"
-        android:layout_marginRight="@dimen/fab_margins"
-        android:src="@drawable/ic_save"
-        app:backgroundTint="@android:color/white"
-        tools:ignore="RelativeOverlap" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:visibility="gone"
-        android:onClick="shareMe"
-        android:id="@+id/share_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginBottom="@dimen/fab_margins"
-        android:layout_marginLeft="@dimen/fab_margins"
-        android:layout_marginStart="@dimen/fab_margins"
-        android:src="@drawable/ic_share"
-        app:backgroundTint="@android:color/white" />
 
 </RelativeLayout>

@@ -58,33 +58,13 @@ class BitmapUtils {
          return BitmapFactory.decodeFile(imagePath);
      }
 
-     /**
-      * Creates the temporary image file in the cache directory.
-      *
-      * @return The temporary image file.
-      * @throws IOException Thrown if there is an error creating the file
-      */
      static File createTempImageFile(Context context) throws IOException {
-
          String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
-
          String imageFileName = "JPEG_" + timeStamp + "_";
-
          File storageDir = context.getExternalCacheDir();
-
-         return File.createTempFile(
-                 imageFileName,  /* prefix */
-                 ".jpg",         /* suffix */
-                 storageDir      /* directory */
-         );
+         return File.createTempFile(imageFileName, ".jpg", storageDir);
      }
 
-     /**
-      * Deletes image file for a given path.
-      *
-      * @param context   The application context.
-      * @param imagePath The path of the photo to be deleted.
-      */
      static boolean deleteImageFile(Context context, String imagePath) {
          // Get the file
          File imageFile = new File(imagePath);
@@ -101,12 +81,6 @@ class BitmapUtils {
          return deleted;
      }
 
-     /**
-      * Helper method for adding the photo to the system photo gallery so it can be accessed
-      * from other apps.
-      *
-      * @param imagePath The path of the saved image
-      */
      private static void galleryAddPic(Context context, String imagePath) {
          Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
          File f = new File(imagePath);

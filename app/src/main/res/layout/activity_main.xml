@@ -33,7 +33,7 @@
 
     <ImageView
         android:id="@+id/image_view"
-        android:visibility="gone"
+        android:visibility="visible"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
@@ -41,6 +41,7 @@
         android:layout_margin="@dimen/view_margin"
         android:scaleType="fitCenter"
         android:contentDescription="@string/imageview_description" />
+
 
     <RelativeLayout
         android:id="@+id/rela"
@@ -59,27 +60,6 @@
             app:backgroundTint="@android:color/white"
             tools:ignore="RelativeOverlap" />
 
-        <ImageView
-            android:layout_centerInParent="true"
-            android:id="@+id/result"
-            android:visibility="gone"
-            android:layout_width="wrap_content"
-            android:layout_height="100dp"
-            android:text="@string/emojify_me"
-            android:textColor="#EEE"
-            android:src="@drawable/smile"
-            android:layout_centerHorizontal="true"
-            />
-
-        <pl.droidsonroids.gif.GifImageView
-            android:id="@+id/gif"
-            android:visibility="gone"
-            android:layout_width="100dp"
-            android:layout_height="80dp"
-            android:layout_centerInParent="true"
-            android:src="@drawable/run"
-            />
-
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:layout_margin="@dimen/fab_margins"
             android:onClick="shareMe"
@@ -92,6 +72,18 @@
     </RelativeLayout>
 
     </LinearLayout>
+
+
+    <pl.droidsonroids.gif.GifImageView
+        android:id="@+id/gif"
+        android:visibility="gone"
+        android:layout_width="100dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="180dp"
+        android:layout_height="80dp"
+        android:src="@drawable/run"
+        />
 
 
     <TextView

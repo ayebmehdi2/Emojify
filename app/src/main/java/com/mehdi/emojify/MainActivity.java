@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Matrix;
 import androidx.exifinterface.media.ExifInterface;
 import android.net.Uri;
@@ -35,6 +36,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -48,7 +51,6 @@ public class MainActivity extends AppCompatActivity {
     private FloatingActionButton mClearFab;
 
     private TextView mTitleTextView;
-    private ImageView mResult;
     private GifImageView gif;
 
 
@@ -67,7 +69,6 @@ public class MainActivity extends AppCompatActivity {
         mEmojifyButton = findViewById(R.id.emojify_button);
         mClearFab = findViewById(R.id.clear_button);
         mTitleTextView = findViewById(R.id.title_text_view);
-        mResult = findViewById(R.id.result);
         layout = findViewById(R.id.rela);
         gif = findViewById(R.id.gif);
         visibleBegin();
@@ -211,88 +212,129 @@ public class MainActivity extends AppCompatActivity {
 
 
     @SuppressLint("StaticFieldLeak")
-    class as extends AsyncTask<Bitmap, Void, Integer>{
+    class as extends AsyncTask<Bitmap, Void, Bitmap>{
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            mResult.setVisibility(View.GONE);
             gif.setVisibility(View.VISIBLE);
 
         }
 
         @Override
-        protected Integer doInBackground(Bitmap... bitmaps) {
+        protected Bitmap doInBackground(Bitmap... bitmaps) {
+
             FaceDetector detector = new FaceDetector.Builder(MainActivity.this)
                     .setTrackingEnabled(false)
                     .setClassificationType(FaceDetector.ALL_CLASSIFICATIONS)
                     .build();
+
             Frame frame = new Frame.Builder().setBitmap(bitmaps[0]).build();
             SparseArray<Face> faces = detector.detect(frame);
 
-            StringBuilder stat = new StringBuilder("Not defind");
+            Bitmap bitmapWithEmojis = null;
             if (faces.size() > 0){
                 for (int i = 0; i < faces.size(); i++){
                     Face face = faces.valueAt(i);
-                    float leftOpen = face.getIsLeftEyeOpenProbability();
-                    float rightOpen = face.getIsRightEyeOpenProbability();
-                    float smile = face.getIsSmilingProbability();
-                    float f = Face.UNCOMPUTED_PROBABILITY;
-
-                    boolean left = (leftOpen != f) && (leftOpen >= 0.2);
-                    boolean right = (rightOpen != f) && (rightOpen >= 0.2);
-                    boolean smil = (smile != f) && (smile >= 0.2);
-
-
-                    if (left && right){
-                        stat = new StringBuilder("d");
-                    }
-                    if (right && !left){
-                        stat = new StringBuilder("r");
-                    }
-                    if (!right && left){
-                        stat = new StringBuilder("l");
-                    }
-                    if (!right && !left){
-                        stat = new StringBuilder("c");
-                    }
-
-                    if (smil){
-                        stat.append("o");
-                    }else {
-                        stat.append("c");
-                    }
-
-                    switch (stat.toString()){
-                        case "do":
-                            return R.drawable.smile;
-                        case "ro":
-                            return R.drawable.rightwink;
-                        case "lo":
-                            return R.drawable.leftwink;
-                        case "dc":
-                            return R.drawable.frown;
-                        case "rc":
-                            return R.drawable.rightwinkfrown;
-                        case "lc":
-                            return R.drawable.leftwinkfrown;
-                        case "co":
-                            return R.drawable.closed_smile;
-                        case "cc":
-                            return R.drawable.closed_frown;
-                        default:
-                            return -1; } }}
+                    int Emoji = whicheEmoji(face);
+                     bitmapWithEmojis = addBitmapToFace(bitmaps[0], BitmapFactory.decodeResource(getResources(), Emoji), face);
+                     }}
             detector.release();
-            return -1;
+            return bitmapWithEmojis;
         }
+
         @Override
-        protected void onPostExecute(Integer s) {
+        protected void onPostExecute(Bitmap s) {
             super.onPostExecute(s);
             gif.setVisibility(View.GONE);
             //Toast.makeText(MainActivity.this, s, Toast.LENGTH_LONG).show();
-            mResult.setVisibility(View.VISIBLE);
-            if (s != -1) mResult.setImageResource(s);
+            if (s != null){
+                mResultsBitmap = s;
+                mImageView.setImageBitmap(s);
+            }
         }
 
+    }
+
+    public Integer whicheEmoji(Face face){
+
+        StringBuilder stat = new StringBuilder("Not defind");
+
+        float leftOpen = face.getIsLeftEyeOpenProbability();
+        float rightOpen = face.getIsRightEyeOpenProbability();
+        float smile = face.getIsSmilingProbability();
+        float f = Face.UNCOMPUTED_PROBABILITY;
+
+        boolean left = (leftOpen != f) && (leftOpen >= 0.5);
+        boolean right = (rightOpen != f) && (rightOpen >= 0.5);
+        boolean smil = (smile != f) && (smile >= 0.15);
+
+
+        if (left && right){
+            stat = new StringBuilder("d");
+        }
+        if (right && !left){
+            stat = new StringBuilder("r");
+        }
+        if (!right && left){
+            stat = new StringBuilder("l");
+        }
+        if (!right && !left){
+            stat = new StringBuilder("c");
+        }
+
+        if (smil){
+            stat.append("o");
+        }else {
+            stat.append("c");
+        }
+
+        switch (stat.toString()){
+            case "do":
+                return R.drawable.smile;
+            case "ro":
+                return R.drawable.leftwink;
+            case "lo":
+                return R.drawable.rightwink;
+            case "dc":
+                return R.drawable.frown;
+            case "rc":
+                return R.drawable.leftwinkfrown;
+            case "lc":
+                return R.drawable.rightwinkfrown;
+            case "co":
+                return R.drawable.closed_smile;
+            case "cc":
+                return R.drawable.closed_frown;
+            default:
+                return -1;
+        }
+    }
+
+
+    private static Bitmap addBitmapToFace(Bitmap backgroundBitmap, Bitmap emojiBitmap, Face face) {
+
+        Bitmap resultBitmap = Bitmap.createBitmap(backgroundBitmap.getWidth(),
+                backgroundBitmap.getHeight(), backgroundBitmap.getConfig());
+
+        float scaleFactor = .9f;
+
+        int newEmojiWidth = (int) (face.getWidth() * scaleFactor);
+        int newEmojiHeight = (int) (emojiBitmap.getHeight() *
+                newEmojiWidth / emojiBitmap.getWidth() * scaleFactor);
+
+
+        emojiBitmap = Bitmap.createScaledBitmap(emojiBitmap, newEmojiWidth, newEmojiHeight, false);
+
+        float emojiPositionX =
+                (face.getPosition().x + face.getWidth() / 2) - emojiBitmap.getWidth() / 2;
+        float emojiPositionY =
+                (face.getPosition().y + face.getHeight() / 2) - emojiBitmap.getHeight() / 3;
+
+        Canvas canvas = new Canvas(resultBitmap);
+        canvas.drawBitmap(backgroundBitmap, 0, 0, null);
+        canvas.drawBitmap(emojiBitmap, emojiPositionX, emojiPositionY, null);
+
+        return resultBitmap;
     }
 
     public char bettweenOne(float f){

@@ -14,7 +14,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
-import android.media.ExifInterface;
+import androidx.exifinterface.media.ExifInterface;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -30,6 +30,7 @@ import android.widget.Toast;
 import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
+import com.google.android.gms.vision.face.Landmark;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.File;
@@ -47,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
     private FloatingActionButton mClearFab;
 
     private TextView mTitleTextView;
-    private TextView mResult;
+    private ImageView mResult;
     private GifImageView gif;
 
 
@@ -214,6 +215,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            mResult.setVisibility(View.GONE);
             gif.setVisibility(View.VISIBLE);
 
         }
@@ -222,27 +224,88 @@ public class MainActivity extends AppCompatActivity {
         protected Integer doInBackground(Bitmap... bitmaps) {
             FaceDetector detector = new FaceDetector.Builder(MainActivity.this)
                     .setTrackingEnabled(false)
-                    .setLandmarkType(FaceDetector.ALL_LANDMARKS)
+                    .setClassificationType(FaceDetector.ALL_CLASSIFICATIONS)
                     .build();
-
             Frame frame = new Frame.Builder().setBitmap(bitmaps[0]).build();
-
             SparseArray<Face> faces = detector.detect(frame);
-            return faces.size();
-        }
 
+            StringBuilder stat = new StringBuilder("Not defind");
+            if (faces.size() > 0){
+                for (int i = 0; i < faces.size(); i++){
+                    Face face = faces.valueAt(i);
+                    float leftOpen = face.getIsLeftEyeOpenProbability();
+                    float rightOpen = face.getIsRightEyeOpenProbability();
+                    float smile = face.getIsSmilingProbability();
+                    float f = Face.UNCOMPUTED_PROBABILITY;
+
+                    boolean left = (leftOpen != f) && (leftOpen >= 0.2);
+                    boolean right = (rightOpen != f) && (rightOpen >= 0.2);
+                    boolean smil = (smile != f) && (smile >= 0.2);
+
+
+                    if (left && right){
+                        stat = new StringBuilder("d");
+                    }
+                    if (right && !left){
+                        stat = new StringBuilder("r");
+                    }
+                    if (!right && left){
+                        stat = new StringBuilder("l");
+                    }
+                    if (!right && !left){
+                        stat = new StringBuilder("c");
+                    }
+
+                    if (smil){
+                        stat.append("o");
+                    }else {
+                        stat.append("c");
+                    }
+
+                    switch (stat.toString()){
+                        case "do":
+                            return R.drawable.smile;
+                        case "ro":
+                            return R.drawable.rightwink;
+                        case "lo":
+                            return R.drawable.leftwink;
+                        case "dc":
+                            return R.drawable.frown;
+                        case "rc":
+                            return R.drawable.rightwinkfrown;
+                        case "lc":
+                            return R.drawable.leftwinkfrown;
+                        case "co":
+                            return R.drawable.closed_smile;
+                        case "cc":
+                            return R.drawable.closed_frown;
+                        default:
+                            return -1; } }}
+            detector.release();
+            return -1;
+        }
         @Override
-        protected void onPostExecute(Integer integer) {
-            super.onPostExecute(integer);
+        protected void onPostExecute(Integer s) {
+            super.onPostExecute(s);
             gif.setVisibility(View.GONE);
-            String  r = "Destected " + integer;
-            Toast.makeText(MainActivity.this, r, Toast.LENGTH_LONG).show();
+            //Toast.makeText(MainActivity.this, s, Toast.LENGTH_LONG).show();
             mResult.setVisibility(View.VISIBLE);
-            mResult.setText(r);
+            if (s != -1) mResult.setImageResource(s);
         }
 
     }
 
+    public char bettweenOne(float f){
+        if (f > 0.0 && f < 0.25){
+            return 'A';
+        }else if (f > 0.25 && f < 0.50){
+            return 'B';
+        }else if (f > 0.50 && f < 0.70){
+            return 'C';
+        }else {
+            return 'D';
+        }
+    }
 
     public void saveMe(View view) {
         BitmapUtils.deleteImageFile(this, mTempPhotoPath);

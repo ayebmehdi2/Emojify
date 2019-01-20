@@ -44,7 +44,7 @@
 
     <RelativeLayout
         android:id="@+id/rela"
-        android:visibility="gone"
+        android:visibility="visible"
         android:layout_alignParentBottom="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -59,16 +59,16 @@
             app:backgroundTint="@android:color/white"
             tools:ignore="RelativeOverlap" />
 
-        <TextView
+        <ImageView
             android:layout_centerInParent="true"
             android:id="@+id/result"
             android:visibility="gone"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="100dp"
             android:text="@string/emojify_me"
             android:textColor="#EEE"
+            android:src="@drawable/smile"
             android:layout_centerHorizontal="true"
-            android:textSize="20sp"
             />
 
         <pl.droidsonroids.gif.GifImageView

@@ -16,6 +16,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import androidx.exifinterface.media.ExifInterface;
+import timber.log.Timber;
+
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -72,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
         layout = findViewById(R.id.rela);
         gif = findViewById(R.id.gif);
         visibleBegin();
+        Timber.plant(new Timber.DebugTree());
     }
 
     @SuppressLint("RestrictedApi")
@@ -309,26 +312,12 @@ public class MainActivity extends AppCompatActivity {
 
 
     private static Bitmap addBitmapToFace(Bitmap backgroundBitmap, Bitmap emojiBitmap, Face face) {
-
         Bitmap resultBitmap = Bitmap.createBitmap(backgroundBitmap.getWidth(),
                 backgroundBitmap.getHeight(), backgroundBitmap.getConfig());
-
-        float scaleFactor = 1f;
-
-        int newEmojiWidth = (int) (face.getWidth() * scaleFactor);
-        int newEmojiHeight = (int) (emojiBitmap.getHeight() * newEmojiWidth / emojiBitmap.getWidth() * scaleFactor);
-
-
-        emojiBitmap = Bitmap.createScaledBitmap(emojiBitmap, newEmojiWidth, newEmojiHeight, false);
-
-        float emojiPositionX = (face.getPosition().x + face.getWidth() / 2) - emojiBitmap.getWidth() / 2;
-
-        float emojiPositionY = (face.getPosition().y + face.getHeight() / 2) - emojiBitmap.getHeight() / 3;
-
+        emojiBitmap = Bitmap.createScaledBitmap(emojiBitmap,(int) face.getWidth(),(int) face.getHeight(), false);
         Canvas canvas = new Canvas(resultBitmap);
         canvas.drawBitmap(backgroundBitmap, 0, 0, null);
-        canvas.drawBitmap(emojiBitmap, emojiPositionX, emojiPositionY, null);
-
+        canvas.drawBitmap(emojiBitmap, face.getPosition().x, face.getPosition().y, null);
         return resultBitmap;
     }
 

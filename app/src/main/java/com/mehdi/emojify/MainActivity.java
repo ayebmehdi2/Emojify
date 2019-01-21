@@ -156,14 +156,11 @@ public class MainActivity extends AppCompatActivity {
     @SuppressLint("RestrictedApi")
     private void processAndSetImage(){
 
-        // Toggle Visibility of the views
         visibleFun();
-
         mResultsBitmap = imageRotated();
-
+        mImageView.setImageBitmap(mResultsBitmap);
         new as().execute(mResultsBitmap);
 
-        mImageView.setImageBitmap(mResultsBitmap);
     }
 
     public Bitmap imageRotated(){
@@ -316,19 +313,17 @@ public class MainActivity extends AppCompatActivity {
         Bitmap resultBitmap = Bitmap.createBitmap(backgroundBitmap.getWidth(),
                 backgroundBitmap.getHeight(), backgroundBitmap.getConfig());
 
-        float scaleFactor = .9f;
+        float scaleFactor = 1f;
 
         int newEmojiWidth = (int) (face.getWidth() * scaleFactor);
-        int newEmojiHeight = (int) (emojiBitmap.getHeight() *
-                newEmojiWidth / emojiBitmap.getWidth() * scaleFactor);
+        int newEmojiHeight = (int) (emojiBitmap.getHeight() * newEmojiWidth / emojiBitmap.getWidth() * scaleFactor);
 
 
         emojiBitmap = Bitmap.createScaledBitmap(emojiBitmap, newEmojiWidth, newEmojiHeight, false);
 
-        float emojiPositionX =
-                (face.getPosition().x + face.getWidth() / 2) - emojiBitmap.getWidth() / 2;
-        float emojiPositionY =
-                (face.getPosition().y + face.getHeight() / 2) - emojiBitmap.getHeight() / 3;
+        float emojiPositionX = (face.getPosition().x + face.getWidth() / 2) - emojiBitmap.getWidth() / 2;
+
+        float emojiPositionY = (face.getPosition().y + face.getHeight() / 2) - emojiBitmap.getHeight() / 3;
 
         Canvas canvas = new Canvas(resultBitmap);
         canvas.drawBitmap(backgroundBitmap, 0, 0, null);
@@ -337,17 +332,6 @@ public class MainActivity extends AppCompatActivity {
         return resultBitmap;
     }
 
-    public char bettweenOne(float f){
-        if (f > 0.0 && f < 0.25){
-            return 'A';
-        }else if (f > 0.25 && f < 0.50){
-            return 'B';
-        }else if (f > 0.50 && f < 0.70){
-            return 'C';
-        }else {
-            return 'D';
-        }
-    }
 
     public void saveMe(View view) {
         BitmapUtils.deleteImageFile(this, mTempPhotoPath);
